@@ -32,7 +32,11 @@ public class MemberController {
 
         Boolean isValidate = memberService.validatePassword(req);
 
-        return ApiResponse.success(String.valueOf(Status.OK.getCode()),
-                Status.OK.getMessage(), isValidate);
+        if (isValidate)
+            return ApiResponse.success(String.valueOf(Status.OK.getCode()),
+                    Status.OK.getMessage(), null);
+        else
+            return ApiResponse.onFailure(String.valueOf(Status.BAD_REQUEST.getCode()),
+                    "검증을 요청한 비밀번호가 유효하지 않습니다.", null);
     }
 }
