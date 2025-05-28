@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -17,6 +18,47 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> methodArgumentNotValidException(
+            MethodArgumentNotValidException methodArgumentNotValidException,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.onFailure(
+                String.valueOf(400),
+                methodArgumentNotValidException.getMessage(),
+                methodArgumentNotValidException.getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(error -> String.format("필드 '%s': %s", error.getField(), error.getDefaultMessage()))
+                        .toList()
+        );
+        WebRequest webRequest = new ServletWebRequest(request);
+        return super.handleExceptionInternal(
+                methodArgumentNotValidException,
+                response,
+                HttpHeaders.EMPTY,
+                methodArgumentNotValidException.getStatusCode(),
+                webRequest
+        );
+    }
+
+    @ExceptionHandler(GeneralException.class)
+    public ResponseEntity<Object> generalException(
+            GeneralException generalException,
+            HttpServletRequest request
+    ) {
+        Body body = generalException.getBody();
+        ApiResponse<Object> response = ApiResponse.onFailure(String.valueOf(body.getCode()), body.getMessage(), null);
+        WebRequest webRequest = new ServletWebRequest(request);
+        return super.handleExceptionInternal(
+                generalException,
+                response,
+                HttpHeaders.EMPTY,
+                body.getHttpStatus(),
+                webRequest
+        );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> unexpectedException(
@@ -35,23 +77,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             webRequest
         );
     }
-
-    @ExceptionHandler(GeneralException.class)
-    public ResponseEntity<Object> exception(
-        GeneralException generalException,
-        HttpServletRequest request
-    ) {
-        Body body = generalException.getBody();
-        ApiResponse<Object> response = ApiResponse.onFailure(String.valueOf(body.getCode()), body.getMessage(), null);
-        WebRequest webRequest = new ServletWebRequest(request);
-        return super.handleExceptionInternal(
-            generalException,
-            response,
-            HttpHeaders.EMPTY,
-            body.getHttpStatus(),
-            webRequest
-        );
-    }
-    
-
 }
