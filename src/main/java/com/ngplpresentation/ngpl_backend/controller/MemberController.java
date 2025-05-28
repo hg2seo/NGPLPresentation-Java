@@ -1,10 +1,13 @@
 package com.ngplpresentation.ngpl_backend.controller;
 
-import com.ngplpresentation.ngpl_backend.dto.PasswordValidateRequest;
-import com.ngplpresentation.ngpl_backend.handler.GeneralException;
+import com.ngplpresentation.ngpl_backend.domain.Member;
+import com.ngplpresentation.ngpl_backend.dto.DeleteRequest;
+import com.ngplpresentation.ngpl_backend.dto.RegisterRequest;
+import com.ngplpresentation.ngpl_backend.dto.UpdateRequest;
 import com.ngplpresentation.ngpl_backend.service.MemberService;
 import com.ngplpresentation.ngpl_backend.dto.response.ApiResponse;
 import com.ngplpresentation.ngpl_backend.dto.response.Status;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,19 +24,36 @@ public class MemberController {
             Status.OK.getMessage(), null);
     }
 
-    @PostMapping("/validate_password")
-    public ApiResponse<?> checkPasswordValidation(@RequestBody PasswordValidateRequest req) {
+    @PostMapping("/register")
+    public ApiResponse<?> registerNewMember(@Valid @RequestBody RegisterRequest request) {
+        Member member = memberService.registerMember(request);
 
-        if (req == null)
-            throw new GeneralException(Status.BAD_REQUEST);
-
-        Boolean isValidate = memberService.validatePassword(req);
-
-        if (isValidate)
-            return ApiResponse.success(String.valueOf(Status.OK.getCode()),
-                    Status.OK.getMessage(), null);
-        else
-            return ApiResponse.onFailure(String.valueOf(Status.BAD_REQUEST.getCode()),
-                    "검증을 요청한 비밀번호가 유효하지 않습니다.", null);
+        return ApiResponse.success(String.valueOf(Status.OK.getCode()),
+                Status.OK.getMessage(), member);
     }
+
+    @GetMapping("/account")
+    public ApiResponse<?> getMemberInfo(@RequestParam String userId) {
+        Member member = memberService.findMember(userId);
+
+        return ApiResponse.success(String.valueOf(Status.OK.getCode()),
+                Status.OK.getMessage(), member);
+    }
+
+    @PostMapping("/update")
+    public ApiResponse<?> updateMember(@Valid @RequestBody UpdateRequest request) {
+        Member member = memberService.updateMember(request);
+
+        return ApiResponse.success(String.valueOf(Status.OK.getCode()),
+                Status.OK.getMessage(), member);
+    }
+
+    @PostMapping("/quit")
+    public ApiResponse<?> deleteMember(@Valid @RequestBody DeleteRequest request) {
+        memberService.deleteMember(request);
+
+        return ApiResponse.success(String.valueOf(Status.OK.getHttpStatus()),
+                Status.OK.getMessage(), null);
+    }
+
 }
