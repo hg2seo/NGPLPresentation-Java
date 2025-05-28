@@ -1,4 +1,4 @@
-package com.ngplpresentation.ngpl_backend.response;
+package com.ngplpresentation.ngpl_backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

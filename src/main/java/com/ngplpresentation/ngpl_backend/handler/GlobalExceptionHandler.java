@@ -1,14 +1,12 @@
 package com.ngplpresentation.ngpl_backend.handler;
 
-import com.ngplpresentation.ngpl_backend.response.ApiResponse;
-import com.ngplpresentation.ngpl_backend.response.Body;
-import com.ngplpresentation.ngpl_backend.response.GeneralException;
-import com.ngplpresentation.ngpl_backend.response.Status;
+import com.ngplpresentation.ngpl_backend.dto.response.ApiResponse;
+import com.ngplpresentation.ngpl_backend.dto.response.Body;
+import com.ngplpresentation.ngpl_backend.dto.response.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

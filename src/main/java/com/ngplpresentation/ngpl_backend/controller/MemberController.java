@@ -1,8 +1,8 @@
 package com.ngplpresentation.ngpl_backend.controller;
 
 import com.ngplpresentation.ngpl_backend.service.MemberService;
-import com.ngplpresentation.ngpl_backend.response.ApiResponse;
-import com.ngplpresentation.ngpl_backend.response.Status;
+import com.ngplpresentation.ngpl_backend.dto.response.ApiResponse;
+import com.ngplpresentation.ngpl_backend.dto.response.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,4 +1,4 @@
-package com.ngplpresentation.ngpl_backend.response;
+package com.ngplpresentation.ngpl_backend.handler;
 
 import lombok.Getter;
 

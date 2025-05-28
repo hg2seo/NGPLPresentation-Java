@@ -1,4 +1,4 @@
-package com.ngplpresentation.ngpl_backend.response;
+package com.ngplpresentation.ngpl_backend.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
