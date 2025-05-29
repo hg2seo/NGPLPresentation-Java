@@ -41,7 +41,7 @@ public class MemberService {
         if (pwd.length() < PWD_MIN_LENGTH || pwd.length() > PWD_MAX_LENGTH)
             throw new GeneralException(Status.BAD_REQUEST_ARGUMENT_PWD_MIN_MAX);
 
-        if (pwd.equals(confpwd))
+        if (!pwd.equals(confpwd))
             throw new GeneralException(Status.BAD_REQUEST_ARGUMENT_PWD_NOT_SAME);
 
         if (memberRepository.findByUserId(userId).isPresent())
@@ -77,6 +77,9 @@ public class MemberService {
     public void deleteMember(DeleteRequest req) {
         Member member = memberRepository.findByUserId(req.getUserId())
                 .orElseThrow(() -> new GeneralException(Status.BAD_REQUEST_NON_EXISTENCE_MEMBER));
+
+        if (!member.getPassword().equals(req.getPassword()))
+            throw new GeneralException(Status.BAD_REQUEST_ARGUMENT_PWD_NOT_SAME);
 
         memberRepository.deleteById(member.getId());
     }
