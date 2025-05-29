@@ -1,14 +1,13 @@
 package com.ngplpresentation.ngpl_backend.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
     @Id
@@ -29,6 +28,16 @@ public class Member {
 
 
     private LocalDateTime registered;
+
+    @Builder
+    public Member(Long id, String userId, String password, String name, String email, LocalDateTime registered) {
+        this.id = id;
+        this.userId = userId;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+        this.registered = registered;
+    }
 
     public void update(String name, String email, String password) {
         this.name = name;
