@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,32 +17,32 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> methodArgumentNotValidException(
-            MethodArgumentNotValidException methodArgumentNotValidException,
-            HttpServletRequest request
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
     ) {
         ApiResponse<Object> response = ApiResponse.onFailure(
-                String.valueOf(400),
-                methodArgumentNotValidException.getMessage(),
-                methodArgumentNotValidException.getBindingResult()
+                String.valueOf(Status.BAD_REQUEST_ARGUMENT.getCode()),
+                Status.BAD_REQUEST_ARGUMENT.getMessage(),
+                ex.getBindingResult()
                         .getFieldErrors()
                         .stream()
-                        .map(error -> String.format("필드 '%s': %s", error.getField(), error.getDefaultMessage()))
-                        .toList()
+                        .collect(Collectors.groupingBy(
+                                FieldError::getField,
+                                Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                        ))
         );
-        WebRequest webRequest = new ServletWebRequest(request);
-        return super.handleExceptionInternal(
-                methodArgumentNotValidException,
-                response,
-                HttpHeaders.EMPTY,
-                methodArgumentNotValidException.getStatusCode(),
-                webRequest
-        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(GeneralException.class)
